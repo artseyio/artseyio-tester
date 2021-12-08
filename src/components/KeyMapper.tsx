@@ -28,7 +28,7 @@ export const KeyMapper: FC<KeyMapperComponentProps> = (props: KeyMapperComponent
         keymap[asCode(yMapping)] = { code: "KeyY", key: "y" };
         keymap[asCode(iMapping)] = { code: "KeyI", key: "i" };
         keymap[asCode(oMapping)] = { code: "KeyO", key: "o" };
-console.dir(keymap);
+
         props.onMappingChanged(keymap);
     }, [aMapping, rMapping, tMapping, sMapping, eMapping, yMapping, iMapping, oMapping]);
 
@@ -54,7 +54,6 @@ console.dir(keymap);
 
 const StyledKeyMapper = styled.div`{}
     margin: 100px 0 0 0;
-    max-width: 700px;
     text-align: center;
 
     #key-map {

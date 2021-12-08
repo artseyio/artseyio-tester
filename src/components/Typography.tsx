@@ -8,12 +8,7 @@ const GlobalStyle = createGlobalStyle`
     html, body, #root {
         width: 100%;
         height: 100%;
-    }
-
-    #root {
         overflow: auto;
-        padding: 50px;
-        box-sizing: border-box;
     }
 
     body {

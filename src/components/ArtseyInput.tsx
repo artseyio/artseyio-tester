@@ -112,7 +112,6 @@ const StyledArtseyInput = styled.div`{}
         font-size: 1.5rem;
         display: flex;
         flex-wrap: wrap;
-        max-width: 700px;
         outline: 0;
         -webkit-user-select: none; /* Safari */        
         -moz-user-select: none; /* Firefox */

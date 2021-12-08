@@ -1,5 +1,6 @@
 {
   "name": "artseyio-tester",
+  "homepage": "https://geaz.github.io/artsyio-tester/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -16,13 +17,16 @@
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.16",
     "@types/styled-components": "^5.1.17",
+    "gh-pages": "^3.2.3",
     "random-words": "^1.1.1",
     "styled-components": "5.3.3",
     "styled-reset": "4.3.4"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build"
+    "build": "react-scripts build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
