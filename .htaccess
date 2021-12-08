@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+RewriteEngine on
+RewriteBase /artsyio-tester/
+RewriteCond %{REQUEST_FILENAME} -s [OR]
+#Rewrite Conditions 
+RewriteCond %{REQUEST_FILENAME} -l [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ – [NC,L]
+RewriteRule ^(.*) /artsyio-tester/index.html [NC,L]
+</IfModule>
