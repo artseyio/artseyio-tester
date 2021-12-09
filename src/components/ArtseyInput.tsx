@@ -28,15 +28,15 @@ function ArtseyInput() {
                     setArtsyKeys(prev => [...prev.slice(0, prev.length - 1)]);
                     setCaretPos(caretPos - 1);
                 }
-                else if(artsyKey !== undefined && artsyKey !== "Backspace") {
-                    if((joinedWordList.split("")[caretPos] === " " && artsyKey === "Space") || (joinedWordList.split("")[caretPos] !== " " && artsyKey !== "Space")) {
+                else if(artsyKey !== undefined && artsyKey !== "Backspace"
+                    && ((joinedWordList.split("")[caretPos] === " " && artsyKey === "Space") || joinedWordList.split("")[caretPos] !== " ")
+                ) {
                         setArtsyKeys(prev => [...prev, artsyKey as string]);
                         setCaretPos(caretPos + 1);
-                    }
                 }                
                 setKeyQueue([]);
             }
-        }, 50);
+        }, 75);
         return () => clearInterval(interval);
     }, [keyQueue]);
 
