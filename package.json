@@ -1,6 +1,6 @@
 {
   "name": "artseyio-tester",
-  "homepage": "https://geaz.github.io/artsyio-tester/",
+  "homepage": "https://artseyio.github.io/artseyio-tester/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
