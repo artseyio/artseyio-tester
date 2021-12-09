@@ -37,8 +37,8 @@ export default function useKeyMapper(getMap: () => { [id: string] : KeyInfo }) {
             .sort()
             .reduce((pre, cur, idx, vals) => { return pre + (pre !== "" ? "_" : "") + cur }, "");
 
-        if(mappedKeys.length === 0) return undefined
-        else if(mappedKeys.length === 1) return mappedKeys[0].key;
-        else return combos[comboKeyCode].key;
+        if(mappedKeys.length === 1) return mappedKeys[0].key;
+        else if(combos.hasOwnProperty(comboKeyCode)) return combos[comboKeyCode].key;
+        else return undefined;
     };
 }
