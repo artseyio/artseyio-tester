@@ -7,7 +7,7 @@ import App from './App';
 import Typography from './components/Typography';
 
 const Theme = {
-    textColor: "#727272",
+    textColor: "#525252",
     textColorFaded: "#bebebe",
     primaryColor: "#0068b4",
     secondaryColor: "#0098ff",
