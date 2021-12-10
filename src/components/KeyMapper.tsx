@@ -1,36 +1,53 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
 import styled from "styled-components";
-import { KeyInfo } from '../effects/KeyMapperEffect';
+import { ChangeEvent, FC, useEffect, useState } from 'react';
+import { ArtsyCode, ArtsyKey, DefaultKeyMaps, KeyMapDefinition } from '../model/KeyMapDefinition';
 
 interface KeyMapperComponentProps {
-    onMappingChanged: (mapping: { [id: string] : KeyInfo }) => void;
+    onMappingChanged: (mapping: KeyMapDefinition) => void;
 }
 
 export const KeyMapper: FC<KeyMapperComponentProps> = (props: KeyMapperComponentProps) => {
-    const [aMapping, setAMapping] = useState("u");
-    const [rMapping, setRMapping] = useState("y");
-    const [tMapping, setTMapping] = useState("t");
-    const [sMapping, setSMapping] = useState("r");
-    const [eMapping, setEMapping] = useState("j");
-    const [yMapping, setYMapping] = useState("h");
-    const [iMapping, setIMapping] = useState("g");
-    const [oMapping, setOMapping] = useState("f");
+    const [keymaps, setKeyMaps] = useState(DefaultKeyMaps);
+    const [mapping, setMapping] = useState<KeyMapDefinition>(DefaultKeyMaps[0]);
 
-    useEffect(() => {
-        let asCode = (key: string) => "Key" + key.toUpperCase();
+    useEffect(() => {        
+        let keymap = localStorage.getItem("keymap");
+        let customMap = keymap ? JSON.parse(keymap) as KeyMapDefinition : undefined;        
+        if(customMap) {
+            setKeyMaps(prev => [...prev, customMap as KeyMapDefinition]);
+        }
 
-        let keymap: { [id: string] : KeyInfo } = {};
-        keymap[asCode(aMapping)] = { code: "KeyA", key: "a" };
-        keymap[asCode(rMapping)] = { code: "KeyR", key: "r" };
-        keymap[asCode(tMapping)] = { code: "KeyT", key: "t" };
-        keymap[asCode(sMapping)] = { code: "KeyS", key: "s" };
-        keymap[asCode(eMapping)] = { code: "KeyE", key: "e" };
-        keymap[asCode(yMapping)] = { code: "KeyY", key: "y" };
-        keymap[asCode(iMapping)] = { code: "KeyI", key: "i" };
-        keymap[asCode(oMapping)] = { code: "KeyO", key: "o" };
+        let selectedMap = localStorage.getItem("selectedMap");
+        if(selectedMap && selectedMap !== "Custom") {
+            let mapping = DefaultKeyMaps.find(map => map.name === selectedMap);
+            if(mapping) setMapping(mapping);
+        }
+        else if(selectedMap && selectedMap === "Custom" && customMap) {            
+            setMapping(customMap);
+        }
+    }, []);
+    useEffect(() => { props.onMappingChanged(mapping); }, [mapping]);
 
-        props.onMappingChanged(keymap);
-    }, [aMapping, rMapping, tMapping, sMapping, eMapping, yMapping, iMapping, oMapping]);
+    const onSelectionChanged = (e: ChangeEvent<HTMLSelectElement>) => {
+        let mapping = keymaps.find(map => map.name === e.target.value);
+        if(mapping) {
+            setMapping(mapping);
+            localStorage.setItem("selectedMap", e.target.value);
+        }
+    };
+
+    const onKeyChanged = (targetCode: ArtsyCode, targetKey: ArtsyKey, value: string) => {
+        let newMapping: KeyMapDefinition = { name: "Custom", keys: { ...mapping.keys } };
+        newMapping.keys[targetCode] = { fromKey: value, toCode: targetCode, toKey: targetKey };
+
+        let newKeyMaps = keymaps.filter(k => k.name !== "Custom");
+        newKeyMaps.push(newMapping);
+
+        setKeyMaps(newKeyMaps);
+        setMapping(newMapping);
+        localStorage.setItem("selectedMap", "Custom");
+        localStorage.setItem("keymap", JSON.stringify(newMapping));
+    };
 
     return (
         <StyledKeyMapper>
@@ -38,15 +55,19 @@ export const KeyMapper: FC<KeyMapperComponentProps> = (props: KeyMapperComponent
                 This is the key mapper. It maps the keys of your keyboard to the indicated keys of artsey. The default mapping is for a left handed usage.
                 If you are already using combos on your keyboard, make sure, that you are not using the regarding keys in the mapping. This can cause problems.
             </p>
+            <p>Please select a predefined mapping or define one yourself.<br/>The mapping will be saved between sessions.</p>
+            <select value={ mapping?.name } onChange={ onSelectionChanged }>
+                { keymaps.map(def => <option value={ def.name }>{ def.name }</option>) }
+            </select>
             <div id="key-map">
-                <div id="artsey-map-a" className="key">A <input value={ aMapping } onChange={ (e) => setAMapping(e.target.value) }></input></div>
-                <div id="artsey-map-r" className="key">R <input value={ rMapping } onChange={ (e) => setRMapping(e.target.value) }></input></div>
-                <div id="artsey-map-t" className="key">T <input value={ tMapping } onChange={ (e) => setTMapping(e.target.value) }></input></div>
-                <div id="artsey-map-s" className="key">S <input value={ sMapping } onChange={ (e) => setSMapping(e.target.value) }></input></div>
-                <div id="artsey-map-e" className="key">E <input value={ eMapping } onChange={ (e) => setEMapping(e.target.value) }></input></div>
-                <div id="artsey-map-y" className="key">Y <input value={ yMapping } onChange={ (e) => setYMapping(e.target.value) }></input></div>
-                <div id="artsey-map-i" className="key">I <input value={ iMapping } onChange={ (e) => setIMapping(e.target.value) }></input></div>
-                <div id="artsey-map-o" className="key">O <input value={ oMapping } onChange={ (e) => setOMapping(e.target.value) }></input></div>
+                <div id="artsey-map-a" className="key">A <input value={ mapping?.keys[ArtsyCode.A].fromKey } onChange={ (e) => onKeyChanged(ArtsyCode.A, ArtsyKey.A, e.target.value) }></input></div>
+                <div id="artsey-map-r" className="key">R <input value={ mapping?.keys[ArtsyCode.R].fromKey } onChange={ (e) => onKeyChanged(ArtsyCode.R, ArtsyKey.R, e.target.value) }></input></div>
+                <div id="artsey-map-t" className="key">T <input value={ mapping?.keys[ArtsyCode.T].fromKey } onChange={ (e) => onKeyChanged(ArtsyCode.T, ArtsyKey.T, e.target.value) }></input></div>
+                <div id="artsey-map-s" className="key">S <input value={ mapping?.keys[ArtsyCode.S].fromKey } onChange={ (e) => onKeyChanged(ArtsyCode.S, ArtsyKey.S, e.target.value) }></input></div>
+                <div id="artsey-map-e" className="key">E <input value={ mapping?.keys[ArtsyCode.E].fromKey } onChange={ (e) => onKeyChanged(ArtsyCode.E, ArtsyKey.E, e.target.value) }></input></div>
+                <div id="artsey-map-y" className="key">Y <input value={ mapping?.keys[ArtsyCode.Y].fromKey } onChange={ (e) => onKeyChanged(ArtsyCode.Y, ArtsyKey.Y, e.target.value) }></input></div>
+                <div id="artsey-map-i" className="key">I <input value={ mapping?.keys[ArtsyCode.I].fromKey } onChange={ (e) => onKeyChanged(ArtsyCode.I, ArtsyKey.I, e.target.value) }></input></div>
+                <div id="artsey-map-o" className="key">O <input value={ mapping?.keys[ArtsyCode.O].fromKey } onChange={ (e) => onKeyChanged(ArtsyCode.O, ArtsyKey.O, e.target.value) }></input></div>
             </div>
         </StyledKeyMapper>
     );
@@ -54,7 +75,20 @@ export const KeyMapper: FC<KeyMapperComponentProps> = (props: KeyMapperComponent
 
 const StyledKeyMapper = styled.div`{}
     margin: 100px 0 0 0;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    select {
+        display: block;
+        margin-bottom: 20px;
+        border: 1px solid ${ p => p.theme.borderColor };
+        border-radius: 5px;
+        padding: 10px;
+        background: white;
+        color: ${ p => p.theme.textColor };
+        font-size: 1rem;
+    }
 
     #key-map {
         display: inline-grid;
@@ -68,12 +102,15 @@ const StyledKeyMapper = styled.div`{}
         height: 50px;
         padding: 10px 5px;
         font-weight: bold;
+        text-align: center;
 
         input {
             width: 100%;
             box-sizing: border-box;
             border: 1px solid ${ p => p.theme.borderColor };
             text-align: center;
+            font-size: 0.8rem;
+            padding: 5px;
         }
     }
 

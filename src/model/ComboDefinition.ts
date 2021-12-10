@@ -1,0 +1,22 @@
+export const Combos: { [id: string]: string } = { 
+    "KeyE_KeyO": "b",
+    "KeyE_KeyY": "c" ,
+    "KeyA_KeyR_KeyT": "d" ,
+    "KeyA_KeyR": "f",
+    "KeyR_KeyT": "g",
+    "KeyE_KeyI": "h",
+    "KeyS_KeyT": "j",
+    "KeyO_KeyY": "k",
+    "KeyE_KeyI_KeyY": "l",
+    "KeyI_KeyO_KeyY": "m",
+    "KeyI_KeyO": "n",
+    "KeyE_KeyI_KeyO": "p",
+    "KeyA_KeyS_KeyT": "q",
+    "KeyI_KeyY": "u",
+    "KeyR_KeyS": "v",
+    "KeyA_KeyS": "w",
+    "KeyR_KeyS_KeyT": "x",
+    "KeyA_KeyR_KeyS_KeyT": "z",
+    "KeyE_KeyI_KeyO_KeyY": "Space",
+    "KeyE_KeyR": "Backspace"
+};

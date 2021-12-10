@@ -1,37 +1,42 @@
-import React, { useEffect, useRef, useState } from 'react';
-import styled from "styled-components";
 import randomWords from "random-words";
-import useKeyMapper, { KeyInfo } from '../effects/KeyMapperEffect';
+import styled from "styled-components";
+import React, { useEffect, useRef, useState } from 'react';
 import { faSync } from '@fortawesome/free-solid-svg-icons';
-import IconButton from './IconButton';
+
 import KeyMapper from './KeyMapper';
+import IconButton from './IconButton';
+import useKeyMapper from '../effects/KeyMapperEffect';
+import { DefaultKeyMaps, KeyMapDefinition } from '../model/KeyMapDefinition';
 
 function ArtseyInput() {
-    const [keymap, setKeyMap] = useState<{ [id: string] : KeyInfo }>({});
-    const [caretPos, setCaretPos] = useState(0);
-    const [artsyKeys, setArtsyKeys] = useState<Array<string>>([]);
-    const [wordList, setWordList] = useState<Array<string>>(randomWords(25));
-    const [joinedWordList, setJoinedWordList] = useState("");
-    const [wordListElements, setWordListElements] = useState<Array<JSX.Element>>();
-    const [keyQueue, setKeyQueue] = useState<Array<React.KeyboardEvent<HTMLInputElement>>>([]);
-    const [isFocused, setFocused] = useState(false);
     const wordDivRef = useRef<HTMLDivElement>(null);
-    const getArtseyValue = useKeyMapper(() => keymap);
 
-    useEffect(() => reset(), []);
-    useEffect(() => { setWordListElements(generateWordListElements()); }, [caretPos, artsyKeys, wordList]);
+    const [isFocused, setFocused] = useState(false);
+    const [keymap, setKeyMap] = useState<KeyMapDefinition>(DefaultKeyMaps[0]);
+    const [keyQueue, setKeyQueue] = useState<Array<React.KeyboardEvent<HTMLInputElement>>>([]);
+
+    const [caretPos, setCaretPos] = useState(0);
+    const [wordList, setWordList] = useState<Array<string>>(randomWords(25));
+    const [enteredKeys, setEnteredKeys] = useState<Array<string>>([]);
+    
+    const getArtseyValue = useKeyMapper(keymap);
+
+    useEffect(() => reset(), []);        
     useEffect(() => {
         const interval = setInterval(() => {
             if(keyQueue.length !== 0) {
+                let joinedWordList = wordList.join(" ");
                 let artsyKey = getArtseyValue(keyQueue);
-                if(artsyKey === "Backspace" && artsyKeys.length > 0) {
-                    setArtsyKeys(prev => [...prev.slice(0, prev.length - 1)]);
+
+                if(artsyKey === "Backspace" && enteredKeys.length > 0) {
+                    setEnteredKeys(prev => [...prev.slice(0, prev.length - 1)]);
                     setCaretPos(caretPos - 1);
                 }
-                else if(artsyKey !== undefined && artsyKey !== "Backspace"
+                else if(
+                    artsyKey !== undefined && artsyKey !== "Backspace"
                     && ((joinedWordList.split("")[caretPos] === " " && artsyKey === "Space") || joinedWordList.split("")[caretPos] !== " ")
                 ) {
-                        setArtsyKeys(prev => [...prev, artsyKey as string]);
+                        setEnteredKeys(prev => [...prev, artsyKey as string]);
                         setCaretPos(caretPos + 1);
                 }                
                 setKeyQueue([]);
@@ -41,12 +46,10 @@ function ArtseyInput() {
     }, [keyQueue]);
 
     const reset = () => {
-        let wordList = randomWords(25);
-        setArtsyKeys([]);
+        setEnteredKeys([]);
         setKeyQueue([]);
         setCaretPos(0);
-        setWordList(wordList);
-        setJoinedWordList(wordList.join(" "));
+        setWordList(randomWords(25));
         wordDivRef.current?.focus()
     }
 
@@ -62,8 +65,8 @@ function ArtseyInput() {
             let wordDiv = <div className="word" key={idxw + w}>
                 { w.split("").map((c, idxc) => {
                     let caret = pos === caretPos ? caretDiv : undefined;
-                    let ele = artsyKeys.length - 1 >= pos
-                        ? <div className={ artsyKeys[pos] === c ? "letter correct" : "letter wrong" } key={idxc + c}>{c}</div>
+                    let ele = enteredKeys.length - 1 >= pos
+                        ? <div className={ enteredKeys[pos] === c ? "letter correct" : "letter wrong" } key={idxc + c}>{c}</div>
                         : <div className="letter" key={idxc + c}>{c}</div>;
                     pos++;
                     return caret !== undefined ? [caret, ele] : [ele];
@@ -81,9 +84,9 @@ function ArtseyInput() {
         <StyledArtseyInput>
             <div id="word-list" tabIndex={0} onFocus={ () => setFocused(true) } onBlur={ () => setFocused(false) } onKeyUp={ onKeyUp } ref={ wordDivRef }>
                 { !isFocused && <div id="focus-message"><p>Focus Please</p></div> }
-                { wordListElements }
+                { generateWordListElements() }
             </div>
-            <small id="keycode-monitor">Last Registered: { artsyKeys.length !== 0 ? artsyKeys[artsyKeys.length - 1] : "NONE" }</small>
+            <small id="keycode-monitor">Last Registered: { enteredKeys.length !== 0 ? enteredKeys[enteredKeys.length - 1] : "NONE" }</small>
             <IconButton icon={faSync} onClick={ reset } ></IconButton>
             <KeyMapper onMappingChanged={ setKeyMap }></KeyMapper>
         </StyledArtseyInput>
