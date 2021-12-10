@@ -20,7 +20,7 @@ const GlobalStyle = createGlobalStyle`
         overflow:hidden;
     }
 
-    p {margin-bottom: 1.15rem; text-align: justify; }
+    p { margin-bottom: 1.15rem; text-align: justify; }
 
     h1, h2, h3, h4, h5 {
         margin: 0 0 2rem 0;

@@ -1,8 +1,14 @@
+import { useState } from "react";
 import styled from "styled-components";
+
 import logo from './assets/logo.png';
 import ArtseyInput from './components/ArtseyInput';
+import KeyMapper from "./components/KeyMapper";
+import { DefaultKeyMaps, KeyMapDefinition } from "./model/KeyMapDefinition";
 
-function App() {
+function App() {    
+    const [keymap, setKeyMap] = useState<KeyMapDefinition>(DefaultKeyMaps[0]);
+
     return (
         <StyledApp>
             <img src={logo} alt="logo" id="logo" />
@@ -10,9 +16,10 @@ function App() {
             <p>
                 On this site you're able to test the great ARTSEY layout. Without the need of a dedicated keyboard. The tester supports all alpha key combos, space and backspace.
                 To learn more about ARTSEY visit the <a href="https://artsey.io" title="ARTSEY Website" target="_blank" rel="noreferrer">website</a>.<br/>
-                <a href="https://raw.githubusercontent.com/artseyio/artsey/main/layout%20diagrams/current.jpg" title="ARTSEY Cheatsheet">Cheatsheet</a> - <a href="Learning_Artsey.pdf" title="Learn ARTSEY Book">Learn ARTSEY Book</a>
             </p>
-            <ArtseyInput></ArtseyInput>
+            <p className="no-margin"><a href="https://raw.githubusercontent.com/artseyio/artsey/main/layout%20diagrams/current.jpg" title="ARTSEY Cheatsheet">Cheatsheet</a> - <a href="Learning_Artsey.pdf" title="Learn ARTSEY Book">Learn ARTSEY Book</a></p>
+            <ArtseyInput keymap={ keymap }></ArtseyInput>
+            <KeyMapper onMappingChanged={ setKeyMap }></KeyMapper>
         </StyledApp>
     );
 }
@@ -30,8 +37,8 @@ const StyledApp = styled.div`
         width: 150px;S
     }
 
-    p {
-        text-align: center;
+    .no-margin {
+        margin: 0;
     }
 `;
 

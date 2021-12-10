@@ -9,6 +9,7 @@ interface KeyMapperComponentProps {
 export const KeyMapper: FC<KeyMapperComponentProps> = (props: KeyMapperComponentProps) => {
     const [keymaps, setKeyMaps] = useState(DefaultKeyMaps);
     const [mapping, setMapping] = useState<KeyMapDefinition>(DefaultKeyMaps[0]);
+    const propOnChange = props.onMappingChanged;
 
     useEffect(() => {        
         let keymap = localStorage.getItem("keymap");
@@ -26,7 +27,7 @@ export const KeyMapper: FC<KeyMapperComponentProps> = (props: KeyMapperComponent
             setMapping(customMap);
         }
     }, []);
-    useEffect(() => { props.onMappingChanged(mapping); }, [mapping]);
+    useEffect(() => { propOnChange(mapping); }, [mapping, propOnChange]);
 
     const onSelectionChanged = (e: ChangeEvent<HTMLSelectElement>) => {
         let mapping = keymaps.find(map => map.name === e.target.value);
@@ -53,11 +54,11 @@ export const KeyMapper: FC<KeyMapperComponentProps> = (props: KeyMapperComponent
         <StyledKeyMapper>
             <p>
                 This is the key mapper. It maps the keys of your keyboard to the indicated keys of artsey. The default mapping is for a left handed usage.
-                If you are already using combos on your keyboard, make sure, that you are not using the regarding keys in the mapping. This can cause problems.
+                If you are already using combos or mod taps on your keyboard, make sure, that you are not using the regarding keys in the mapping. This can cause problems.
             </p>
-            <p>Please select a predefined mapping or define one yourself.<br/>The mapping will be saved between sessions.</p>
+            <p>Please select a predefined mapping or define one yourself. The mapping will be saved between sessions.</p>
             <select value={ mapping?.name } onChange={ onSelectionChanged }>
-                { keymaps.map(def => <option value={ def.name }>{ def.name }</option>) }
+                { keymaps.map(def => <option value={ def.name } key={ def.name }>{ def.name }</option>) }
             </select>
             <div id="key-map">
                 <div id="artsey-map-a" className="key">A <input value={ mapping?.keys[ArtsyCode.A].fromKey } onChange={ (e) => onKeyChanged(ArtsyCode.A, ArtsyKey.A, e.target.value) }></input></div>
@@ -74,7 +75,6 @@ export const KeyMapper: FC<KeyMapperComponentProps> = (props: KeyMapperComponent
 }
 
 const StyledKeyMapper = styled.div`{}
-    margin: 100px 0 0 0;
     display: flex;
     flex-direction: column;
     align-items: center;

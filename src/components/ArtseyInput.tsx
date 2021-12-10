@@ -1,25 +1,27 @@
 import randomWords from "random-words";
 import styled from "styled-components";
-import React, { useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { faSync } from '@fortawesome/free-solid-svg-icons';
 
-import KeyMapper from './KeyMapper';
 import IconButton from './IconButton';
 import useKeyMapper from '../effects/KeyMapperEffect';
-import { DefaultKeyMaps, KeyMapDefinition } from '../model/KeyMapDefinition';
+import { KeyMapDefinition } from '../model/KeyMapDefinition';
 
-function ArtseyInput() {
+interface ArtseyInputComponentProps {
+    keymap: KeyMapDefinition;
+}
+
+export const ArtseyInput: FC<ArtseyInputComponentProps> = (props: ArtseyInputComponentProps) => {
     const wordDivRef = useRef<HTMLDivElement>(null);
 
     const [isFocused, setFocused] = useState(false);
-    const [keymap, setKeyMap] = useState<KeyMapDefinition>(DefaultKeyMaps[0]);
     const [keyQueue, setKeyQueue] = useState<Array<React.KeyboardEvent<HTMLInputElement>>>([]);
 
     const [caretPos, setCaretPos] = useState(0);
     const [wordList, setWordList] = useState<Array<string>>(randomWords(25));
     const [enteredKeys, setEnteredKeys] = useState<Array<string>>([]);
     
-    const getArtseyValue = useKeyMapper(keymap);
+    const getArtseyValue = useKeyMapper(props.keymap);
 
     useEffect(() => reset(), []);        
     useEffect(() => {
@@ -41,9 +43,9 @@ function ArtseyInput() {
                 }                
                 setKeyQueue([]);
             }
-        }, 75);
+        }, 25);
         return () => clearInterval(interval);
-    }, [keyQueue]);
+    }, [keyQueue, enteredKeys, caretPos, getArtseyValue, wordList]);
 
     const reset = () => {
         setEnteredKeys([]);
@@ -60,14 +62,14 @@ function ArtseyInput() {
 
     const generateWordListElements = (): Array<JSX.Element> => {
         let pos = 0;
-        let caretDiv = <div id="caret"></div>;
+        let caretDiv = <div id="caret" key="caret"></div>;
         let words = wordList.map((w, idxw) => {
-            let wordDiv = <div className="word" key={idxw + w}>
+            let wordDiv = <div className="word" key={ idxw }>
                 { w.split("").map((c, idxc) => {
                     let caret = pos === caretPos ? caretDiv : undefined;
                     let ele = enteredKeys.length - 1 >= pos
-                        ? <div className={ enteredKeys[pos] === c ? "letter correct" : "letter wrong" } key={idxc + c}>{c}</div>
-                        : <div className="letter" key={idxc + c}>{c}</div>;
+                        ? <div className={ enteredKeys[pos] === c ? "letter correct" : "letter wrong" } key={ idxc }>{c}</div>
+                        : <div className="letter" key={ idxc }>{c}</div>;
                     pos++;
                     return caret !== undefined ? [caret, ele] : [ele];
                 })}
@@ -87,8 +89,7 @@ function ArtseyInput() {
                 { generateWordListElements() }
             </div>
             <small id="keycode-monitor">Last Registered: { enteredKeys.length !== 0 ? enteredKeys[enteredKeys.length - 1] : "NONE" }</small>
-            <IconButton icon={faSync} onClick={ reset } ></IconButton>
-            <KeyMapper onMappingChanged={ setKeyMap }></KeyMapper>
+            <IconButton icon={faSync} onClick={ reset } ></IconButton>            
         </StyledArtseyInput>
     );
 }
@@ -100,14 +101,10 @@ const StyledArtseyInput = styled.div`{}
     align-items: center;
     align-content: stretch;
     align-items: stretch;
-    margin: 75px 0 25px 0;
+    margin: 100px 0;
 
     #logo {
         width: 150px;
-    }
-
-    p {
-        text-align: center;
     }
 
     #word-list {
