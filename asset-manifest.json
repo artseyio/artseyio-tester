@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.js": "/artseyio-tester/static/js/main.d2e50833.chunk.js",
-    "main.js.map": "/artseyio-tester/static/js/main.d2e50833.chunk.js.map",
+    "main.js": "/artseyio-tester/static/js/main.fdbbb3e8.chunk.js",
+    "main.js.map": "/artseyio-tester/static/js/main.fdbbb3e8.chunk.js.map",
     "runtime-main.js": "/artseyio-tester/static/js/runtime-main.17c602ee.js",
     "runtime-main.js.map": "/artseyio-tester/static/js/runtime-main.17c602ee.js.map",
     "static/js/2.0e97b1af.chunk.js": "/artseyio-tester/static/js/2.0e97b1af.chunk.js",
@@ -13,6 +13,6 @@
   "entrypoints": [
     "static/js/runtime-main.17c602ee.js",
     "static/js/2.0e97b1af.chunk.js",
-    "static/js/main.d2e50833.chunk.js"
+    "static/js/main.fdbbb3e8.chunk.js"
   ]
 }
