@@ -9,6 +9,7 @@ import { KeyMapDefinition } from '../model/KeyMapDefinition';
 
 interface ArtseyInputComponentProps {
     keymap: KeyMapDefinition;
+    keyTimeout: number;
 }
 
 export const ArtseyInput: FC<ArtseyInputComponentProps> = (props: ArtseyInputComponentProps) => {
@@ -43,7 +44,7 @@ export const ArtseyInput: FC<ArtseyInputComponentProps> = (props: ArtseyInputCom
                 }                
                 setKeyQueue([]);
             }
-        }, 25);
+        }, props.keyTimeout);
         return () => clearInterval(interval);
     }, [keyQueue, enteredKeys, caretPos, getArtseyValue, wordList]);
 

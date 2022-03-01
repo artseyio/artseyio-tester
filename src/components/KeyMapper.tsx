@@ -4,12 +4,15 @@ import { ArtsyCode, ArtsyKey, DefaultKeyMaps, KeyMapDefinition } from '../model/
 
 interface KeyMapperComponentProps {
     onMappingChanged: (mapping: KeyMapDefinition) => void;
+    onKeyTimeoutChanged: (timeout: number) => void;
 }
 
 export const KeyMapper: FC<KeyMapperComponentProps> = (props: KeyMapperComponentProps) => {
     const [keymaps, setKeyMaps] = useState(DefaultKeyMaps);
+    const [keyTimeout, setKeyTimeout] = useState(25);
     const [mapping, setMapping] = useState<KeyMapDefinition>(DefaultKeyMaps[0]);
     const propOnChange = props.onMappingChanged;
+    const timeoutOnChange = props.onKeyTimeoutChanged;
 
     useEffect(() => {        
         let keymap = localStorage.getItem("keymap");
@@ -26,8 +29,12 @@ export const KeyMapper: FC<KeyMapperComponentProps> = (props: KeyMapperComponent
         else if(selectedMap && selectedMap === "Custom" && customMap) {            
             setMapping(customMap);
         }
-    }, []);
+
+        let savedTimeout = localStorage.getItem("keyTimeout");
+        if(savedTimeout) setKeyTimeout(parseInt(savedTimeout));
+    }, []);    
     useEffect(() => { propOnChange(mapping); }, [mapping, propOnChange]);
+    useEffect(() => { timeoutOnChange(keyTimeout); }, [keyTimeout, timeoutOnChange]);
 
     const onSelectionChanged = (e: ChangeEvent<HTMLSelectElement>) => {
         let mapping = keymaps.find(map => map.name === e.target.value);
@@ -35,6 +42,11 @@ export const KeyMapper: FC<KeyMapperComponentProps> = (props: KeyMapperComponent
             setMapping(mapping);
             localStorage.setItem("selectedMap", e.target.value);
         }
+    };
+
+    const onTimeoutChanged  = (e: ChangeEvent<HTMLInputElement>) => {
+        setKeyTimeout(parseInt(e.target.value));
+        localStorage.setItem("keyTimeout", e.target.value);
     };
 
     const onKeyChanged = (targetCode: ArtsyCode, targetKey: ArtsyKey, value: string) => {
@@ -69,7 +81,12 @@ export const KeyMapper: FC<KeyMapperComponentProps> = (props: KeyMapperComponent
                 <div id="artsey-map-y" className="key">Y <input value={ mapping?.keys[ArtsyCode.Y].fromKey } onChange={ (e) => onKeyChanged(ArtsyCode.Y, ArtsyKey.Y, e.target.value) }></input></div>
                 <div id="artsey-map-i" className="key">I <input value={ mapping?.keys[ArtsyCode.I].fromKey } onChange={ (e) => onKeyChanged(ArtsyCode.I, ArtsyKey.I, e.target.value) }></input></div>
                 <div id="artsey-map-o" className="key">O <input value={ mapping?.keys[ArtsyCode.O].fromKey } onChange={ (e) => onKeyChanged(ArtsyCode.O, ArtsyKey.O, e.target.value) }></input></div>
-            </div>
+            </div>            
+            <p>
+                The combo registration works with a predefined timer. All buttons pressed during the defined timeout will be registered as one combo. If you are struggeling to get
+                four button combos to work, it might help to increase the timeout.
+            </p>
+            <div id="artsey-timeout"><span>Combo Timeout</span><input value={ keyTimeout } onChange={ onTimeoutChanged }></input><span>ms</span></div>
         </StyledKeyMapper>
     );
 }
@@ -90,9 +107,29 @@ const StyledKeyMapper = styled.div`{}
         font-size: 1rem;
     }
 
+    #artsey-timeout {
+        margin-top: 15px;        
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+
+        input {
+            max-width: 75px;
+            margin-left: 15px;
+            margin-right: 5px;
+            border: 1px solid ${ p => p.theme.borderColor };
+            border-radius: 5px;
+            padding: 10px;
+            background: white;
+            color: ${ p => p.theme.textColor };
+            font-size: 1rem;
+        }
+    }
+
     #key-map {
         display: inline-grid;
-        gap: 10px;
+        gap: 10px;        
+        margin-bottom: 25px;
     }
 
     .key {

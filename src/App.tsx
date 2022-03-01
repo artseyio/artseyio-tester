@@ -8,6 +8,7 @@ import { DefaultKeyMaps, KeyMapDefinition } from "./model/KeyMapDefinition";
 
 function App() {    
     const [keymap, setKeyMap] = useState<KeyMapDefinition>(DefaultKeyMaps[0]);
+    const [keyTimeout, setKeyTimeout] = useState(25);
 
     return (
         <StyledApp>
@@ -18,8 +19,8 @@ function App() {
                 To learn more about ARTSEY visit the <a href="https://artsey.io" title="ARTSEY Website" target="_blank" rel="noreferrer">website</a>.<br/>
             </p>
             <p className="no-margin"><a href="https://raw.githubusercontent.com/artseyio/artsey/main/layout%20diagrams/current.jpg" title="ARTSEY Cheatsheet">Cheatsheet</a> - <a href="Learning_Artsey.pdf" title="Learn ARTSEY Book">Learn ARTSEY Book</a></p>
-            <ArtseyInput keymap={ keymap }></ArtseyInput>
-            <KeyMapper onMappingChanged={ setKeyMap }></KeyMapper>
+            <ArtseyInput keymap={ keymap } keyTimeout={ keyTimeout }></ArtseyInput>
+            <KeyMapper onMappingChanged={ setKeyMap } onKeyTimeoutChanged={ setKeyTimeout }></KeyMapper>
         </StyledApp>
     );
 }
